@@ -1,16 +1,6 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <div class="col-md-2">
-
-    </div>
-    <div class="col-md-10">
+  <div id="hello" class="container">
       <calendar></calendar>
-
-    </div>
-    <div class="col-md-2">
-
-    </div>
   </div>
 </template>
 
@@ -19,7 +9,6 @@ export default {
   name: 'hello',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
     }
   }
 }

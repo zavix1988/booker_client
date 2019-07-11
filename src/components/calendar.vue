@@ -1,30 +1,15 @@
 <template>
     <div id="calendar">
-
-        <table id="calendar2">
-            <thead>
-            <tr>
-                {{ setDefaultVals }}
-                <button @click="prevMonth">‹</button>
-                <td colspan="5">{{ monthYear }}</td>
-                <button @click="nextMonth">›</button>
-            </tr>
-            <tr>
-                <td>Sun</td>
-                <td>Mon</td>
-                <td>Tue</td>
-                <td>Wed</td>
-                <td>Thu</td>
-                <td>Fri</td>
-                <td>Sat</td>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="week in days">
-                <td v-for="day in week">{{ day.dayNum }}</td>
-            </tr>
-            </tbody>
-        </table>
+        <h2>Calendar</h2>
+        <button @click="changeFormat">Change Format</button>
+        <button @click="prevMonth">-</button>
+        <button @click="nextMonth">+</button>
+        <div class="row">
+            <div class="col-md-1" v-for="weekDay in week">{{ weekDay }}</div>
+        </div>
+        <div class="row" v-for="week in days">
+            <div class="col-md-1" v-for="day in week" @click="addEvent(day.dayDate)">{{ day.dayNum }}</div>
+        </div>
     </div>
 </template>
 
@@ -34,65 +19,59 @@
         data(){
             return{
                 date: new Date(),
-                months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'November', 'October', 'December'],
+                weekDays: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
                 selectedMonth: undefined,
                 selectedYear: undefined,
                 lastDay: undefined,
-                firstWeekDay: undefined,
-                lastWeekDay: undefined,
+                firstDay: 0,
                 days: []
             }
         },
         methods:{
-            currentMonth()
+            getCurrentMonth()
             {
-                return this.selectedMonth = this.date.getMonth();
+                this.selectedMonth = this.date.getMonth();
             },
-            currentYear()
+            getCurrentYear()
             {
-                return this.selectedYear = this.date.getFullYear();
+                this.selectedYear = this.date.getFullYear();
             },
             nextMonth()
             {
-                this.getFirstWeekDay();
-                this.getLastDay();
-                this.getLastWeekDay();
-                this.getMonthsDays();
                 if (this.selectedMonth < 11) {
-                    return this.selectedMonth++;
+                    this.selectedMonth++;
+                }else{
+                    this.selectedYear++;
+                    this.selectedMonth = 0;
                 }
-                this.selectedYear++;
-                return this.selectedMonth = 0;
+                this.getLastDay()
+                this.getDaysArray()
             },
             prevMonth()
             {
-                this.getFirstWeekDay();
-                this.getLastDay();
-                this.getLastWeekDay();
-                this.getMonthsDays();
                 if (this.selectedMonth > 0) {
-                    return this.selectedMonth--;
+                    this.selectedMonth--;
+                }else{
+                    this.selectedYear--;
+                    this.selectedMonth = 11;
                 }
-                this.selectedYear--;
-                return this.selectedMonth = 11;
+                this.getLastDay()
+                this.getDaysArray()
             },
-            getLastDay() {
+            getLastDay()
+            {
                 this.lastDay = new Date(this.selectedYear, this.selectedMonth + 1, 0).getDate()
             },
-            getFirstWeekDay() {
-                this.firstWeekDay = new Date(this.selectedYear, this.selectedMonth, 1).getDay();
-            },
-            getLastWeekDay () {
-                this.getLastDay();
-                this.lastWeekDay = new Date(this.selectedYear, this.selectedMonth, this.lastDay).getDay()
-            },
-            getMonthsDays () {
+            getDaysArray()
+            {
+                this.days = [];
                 let week = 0;
                 this.days[week] = [];
                 for (let i = 1; i <= this.lastDay; i++) {
-                    if (new Date(this.selectedYear, this.selectedMonth, i).getDay() != 0) {
+                    if (new Date(this.selectedYear, this.selectedMonth, i).getDay() != this.firstDay) {
                         this.days[week].push({
                             dayNum: i,
+                            dayDate: new Date(this.selectedYear, this.selectedMonth, i),
                             dayWeek: new Date(this.selectedYear, this.selectedMonth, i).getDay()
                         })
                     } else {
@@ -102,11 +81,12 @@
                         }
                         this.days[week].push({
                             dayNum: i,
+                            dayDate: new Date(this.selectedYear, this.selectedMonth, i),
                             dayWeek: new Date(this.selectedYear, this.selectedMonth, i).getDay()
                         })
                     }
                 }
-
+                this.formatFirstWeek()
             },
             formatFirstWeek() {
                 for (let i = this.days[0].length; i < 7; i++) {
@@ -115,25 +95,33 @@
                         dayWeek: i
                     });
                 }
+            },
+            addEvent(data){
+             console.log(data)
+            },
+            changeFormat()
+            {
+                if(this.firstDay == 0){
+                    this.firstDay = 1
+                }else{
+                    this.firstDay = 0
+                }
+                this.getDaysArray();
             }
         },
-        computed: {
-            setDefaultVals: function () {
-                this.getFirstWeekDay();
-                this.getLastWeekDay();
-                this.getLastDay();
-                this.getMonthsDays();
-                this.formatFirstWeek();
-            },
-            monthYear: function () {
-                this.days = [];
-                if (void 0 === this.selectedMonth) {
-                    this.selectedMonth = this.currentMonth();
+        mounted(){
+            this.getCurrentMonth();
+            this.getCurrentYear();
+            this.getLastDay()
+            this.getDaysArray()
+        },
+        computed:{
+            week(){
+                if(this.firstDay == 0){
+                    return ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб']
+                }else{
+                    return  ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
                 }
-                if (void 0 === this.selectedYear) {
-                    this.selectedYear = this.currentYear();
-                }
-                return this.months[this.selectedMonth] + " " + this.selectedYear;
             }
         }
     }
