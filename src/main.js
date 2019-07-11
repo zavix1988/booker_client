@@ -9,11 +9,13 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 import calendar from './components/calendar'
+import navbar from './components/navbar'
 
 Vue.use(BootstrapVue)
 Vue.config.productionTip = false
 
 Vue.component('calendar', calendar)
+Vue.component('navbar', navbar)
 
 /* eslint-disable no-new */
 new Vue({

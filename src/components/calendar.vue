@@ -2,13 +2,20 @@
     <div id="calendar">
         <h2>Calendar</h2>
         <button @click="changeFormat">Change Format</button>
-        <button @click="prevMonth">-</button>
-        <button @click="nextMonth">+</button>
+        
         <div class="row">
+            <div class="col-md-2"><button @click="prevMonth">-</button></div>
+            <div class="col-md-8 center">{{ months[selectedMonth] }} {{ selectedYear }}</div>
+            <div class="col-md-2"><button @click="nextMonth">+</button></div>
+        
+        </div>
+        <div class="row">
+            <div class="col-md-2"></div>
             <div class="col-md-1" v-for="weekDay in week">{{ weekDay }}</div>
         </div>
         <div class="row" v-for="week in days">
-            <div class="col-md-1" v-for="day in week" @click="addEvent(day.dayDate)">{{ day.dayNum }}</div>
+            <div class="col-md-2"></div>
+            <div  v-for="day in week" @click="addEvent(day.dayDate)" v-bind:class="['col-md-1', [0,6].includes(day.dayWeek)?'week-end':'']">{{ day.dayNum }}</div>
         </div>
     </div>
 </template>
@@ -19,11 +26,11 @@
         data(){
             return{
                 date: new Date(),
-                weekDays: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
                 selectedMonth: undefined,
                 selectedYear: undefined,
                 lastDay: undefined,
                 firstDay: 0,
+                months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                 days: []
             }
         },
@@ -92,12 +99,15 @@
                 for (let i = this.days[0].length; i < 7; i++) {
                     this.days[0].unshift({
                         dayNum: undefined,
-                        dayWeek: i
+                        dayWeek: undefined
                     });
                 }
             },
-            addEvent(data){
-             console.log(data)
+            addEvent(date){
+                if((typeof date) != 'undefined'){
+                    if(!(date.getDay() == 0 || date.getDay()==6))
+                        console.log(date)
+                }
             },
             changeFormat()
             {
@@ -128,5 +138,11 @@
 </script>
 
 <style scoped>
+.center{
+    text-align: center
+}
+.week-end{
+    background: red
+}
 
 </style>
