@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Hello from '@/components/Hello'
 import Login from '@/components/Login'
 import Admin from '@/components/Admin'
+import addUser from '@/components/addUser'
 
 Vue.use(Router)
 
@@ -22,6 +23,11 @@ export default new Router({
       path: '/admin',
       name: 'Admin',
       component: Admin
+    },
+    {
+      path: '/admin/add-user',
+      name: 'addUser',
+      component: addUser
     }
   ]
 })

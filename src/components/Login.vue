@@ -1,16 +1,16 @@
 <template>
   <div class="container" id="login">
-    <b-form  @submit.prevent="login">
-        <b-form-group id="input-group-login" label="Логин:" label-for="login">
-            <b-form-input id="login" v-model="form.login" type="name" required placeholder="Логин" ></b-form-input>
-        </b-form-group>
-
-        <b-form-group id="input-group-password" label="Пароль:" label-for="password">
-            <b-form-input id="password" v-model="form.password" type="password" required placeholder="Пароль" ></b-form-input>
-        </b-form-group>
-        
-        <b-button type="submit" variant="primary">Submit</b-button>
-    </b-form>
+    <form  @submit.prevent="login">
+        <div class="form-group">
+            <label for="login">Логин:</label>
+            <input v-model="form.login" type="name" class="form-control" id="login" placeholder="Логин" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input v-model="form.password"  type="password" class="form-control" id="password" placeholder="Пароль" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
   </div>
 </template>
 
@@ -29,7 +29,7 @@ export default {
     methods: {
       login(){
         axios
-        .put('http://booker.loc/api/user/login', 'login='+this.form.login
+        .put('http://tc.geeksforless.net/~user12/booker/api/user/login', 'login='+this.form.login
                                                                                 +'&password='+this.form.password)
         .then(response => {
             if(response.data.token == false){
@@ -37,8 +37,7 @@ export default {
                 console.log(response.data)
                 localStorage.setItem('user', JSON.stringify(response.data));
                 if(response.data.role == 'admin'){
-                    //this.$router.push({name: 'Admin'})
-                    console.log(this.$root.user.login);
+                    this.$router.push({name: 'Admin'})
 
                 }else{
                     this.$router.push({name: 'Hello'})
