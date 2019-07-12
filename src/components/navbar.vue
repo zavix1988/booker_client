@@ -13,11 +13,12 @@
                 <li class="nav-item">
                     <router-link class="nav-link" to="/about">About</router-link>
                 </li>
-                <li class="nav-item" right>
+                <li class="nav-item">
                     <router-link class="nav-link" to="/admin">Admin</router-link>
                 </li>
             </ul>
         </div>
+        <router-link class="btn btn-bd-download d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3" to="/login">Login</router-link>
     </nav>
 
 </template>

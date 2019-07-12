@@ -16,23 +16,38 @@
 
 <script>
 export default {
-  name: 'login',
-  data () {
-    return {
-      form: {
-          login: '',
-          password: ''
-      }
-    }
-  },
-  methods: {
+    name: 'login',
+    data () {
+        return {
+            form: {
+                login: '',
+                password: ''
+            },
+
+        }
+    },
+    methods: {
       login(){
         axios
-        .put('http://tc.geeksforless.net/~user12/bookerclient/api/user/login', 'login='+this.form.login
+        .put('http://booker.loc/api/user/login', 'login='+this.form.login
                                                                                 +'&password='+this.form.password)
-        .then(response => (console.log(response.data)))
+        .then(response => {
+            if(response.data.token == false){
+            }else {
+                console.log(response.data)
+                localStorage.setItem('user', JSON.stringify(response.data));
+                if(response.data.role == 'admin'){
+                    //this.$router.push({name: 'Admin'})
+                    console.log(this.$root.user.login);
+
+                }else{
+                    this.$router.push({name: 'Hello'})
+
+                }
+            }
+        })
       }
-  }
+    }
 }
 </script>
 

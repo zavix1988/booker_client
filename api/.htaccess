@@ -1,0 +1,9 @@
+<Limit GET POST PUT DELETE OPTIONS>
+    Allow from all
+</Limit>
+
+
+
+RewriteEngine On
+RewriteBase /api/
+RewriteRule (.*) http://booker.loc/api/$1 [P]
