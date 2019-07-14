@@ -15,10 +15,13 @@
 </template>
 
 <script>
-export default {
+    import Store from '@/Store'
+
+    export default {
     name: 'login',
     data () {
         return {
+            store: Store,
             form: {
                 login: '',
                 password: ''
@@ -29,13 +32,15 @@ export default {
     methods: {
       login(){
         axios
-        .put('http://tc.geeksforless.net/~user12/booker/api/user/login', 'login='+this.form.login
+        .put('http://booker-client.loc/api/user/login', 'login='+this.form.login
                                                                                 +'&password='+this.form.password)
         .then(response => {
             if(response.data.token == false){
             }else {
-                console.log(response.data)
                 localStorage.setItem('user', JSON.stringify(response.data));
+                this.store.user.login = response.data.login;
+                this.store.user.token = response.data.token;
+                this.store.user.role = response.data.role;
                 if(response.data.role == 'admin'){
                     this.$router.push({name: 'Admin'})
 

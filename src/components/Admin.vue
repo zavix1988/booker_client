@@ -1,7 +1,30 @@
 <template>
     <div id="admin" class="container">
-        <button class="btn btn-primary" @click="addUser">Add User</button>
-        <span v-if="users !== undefined">{{ users }}</span>
+        <button class="btn btn-primary" @click="addUser()">Add User</button>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">First</th>
+                <th scope="col">Last</th>
+                <th scope="col" colspan="2">Handle</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-if="users.length > 0" v-for="(user, key) in users ">
+                <th scope="row">{{ key+1 }}</th>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.last_name }}</td>
+                <td>{{ user.email }}</td>
+                <td><button class="btn btn-secondary" @click="editUser(user.login)">Edit</button></td>
+                <td><button class="btn btn-danger" @click="deleteUser(user.login)">Delete</button></td>
+            </tr>
+            <tr v-else>
+                <td>Нет добавленых юзеров</td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="error" v-if="error">Error - {{ this.error }}</div>
     </div>
 </template>
 
@@ -12,24 +35,41 @@
         data(){
             return{
                 store: Store,
-                users: undefined
+                users: [],
+                error: undefined,
             }
         },
         methods: {
             addUser(){
                 this.$router.push({name: "addUser"})
+            },
+            editUser(login){
+                this.$router.push({name: 'editUser', params: {login: login}})
+
+            },
+            deleteUser(login){
+                axios
+                    .delete('http://booker-client.loc/api/admin/user/'+login)
+                    .then(response => {
+                        if(response.data.rowsCount == 'null'){
+                            this.error = 'Unknown user'
+                        }else{
+                            this.getUsers();
+                        }
+                    }).catch(error => console.log(error));
+            },
+            getUsers(){
+                axios.get('http://booker-client.loc/api/admin/allUsers/'+this.store.user.login+'/'+this.store.user.token)
+                    .then(response => {
+                            this.users = response.data
+                    }).catch(error => console.log(error))
             }
         },
         created(){
-
+            this.getUsers();
         },
         mounted(){
-            axios.get('http://tc.geeksforless.net/~user12/booker/api/admin/allUsers/'+this.store.user.login+'/'+this.store.user.token)
-                .then(response => {
-                    if(response.data.length > 0){
-                        this.users = response.data
-                    }
-                }).catch(error => console.log(error))
+
         }
     }
 </script>

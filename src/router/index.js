@@ -4,6 +4,7 @@ import Hello from '@/components/Hello'
 import Login from '@/components/Login'
 import Admin from '@/components/Admin'
 import addUser from '@/components/addUser'
+import editUser from '@/components/editUser'
 
 Vue.use(Router)
 
@@ -28,6 +29,11 @@ export default new Router({
       path: '/admin/add-user',
       name: 'addUser',
       component: addUser
+    },
+    {
+      path: '/admin/edit/:login',
+      name: 'editUser',
+      component: editUser
     }
   ]
 })
