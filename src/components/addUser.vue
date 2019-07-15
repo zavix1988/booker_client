@@ -31,6 +31,7 @@
 </template>
 
 <script>
+    import Store from '@/Store'
 
 export default {
     name: "addUser",
@@ -43,21 +44,23 @@ export default {
                 email: '',
                 first_name: '',
                 last_name: '',
-            }
+            },
+            store: Store
         }
     },
     methods: {
         register(){
             if(this.form.password == this.form.retry){
             axios
-                .post('http://booker-client.loc/api/admin/register/', 'login='+this.form.login
+                .post('http://bookerclient.loc/api/admin/register/', 'login='+this.form.login
                                                                                         +'&password='+this.form.password
                                                                                         +'&retry='+this.form.retry
                                                                                         +'&first_name='+this.form.first_name
                                                                                         +'&last_name='+this.form.last_name
-                                                                                        +'&email='+this.form.email)
+                                                                                        +'&email='+this.form.email
+                                                                                        +'&user='+this.store.user.login
+                                                                                        +'&token='+this.store.user.token)
                 .then(response=>{
-                    console.log(response.data.result)
                     if(response.data.result == true){
                         this.$router.push({name: 'Admin'})
                     }

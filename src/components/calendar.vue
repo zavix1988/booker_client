@@ -1,7 +1,18 @@
 <template>
     <div id="calendar">
         <h2>Calendar</h2>
-        <button @click="changeFormat">Change Format</button>
+        <div class="row">
+            <div class="col-md-6"><button @click="changeFormat">Change Format</button></div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="rooms">Select room</label>
+                    <select class="form-control" id="rooms">
+                        <option v-for="room in rooms">{{room.name}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
         
         <div class="row">
             <div class="col-md-2"><button @click="prevMonth">-</button></div>
@@ -15,12 +26,13 @@
         </div>
         <div class="row" v-for="week in days">
             <div class="col-md-2"></div>
-            <div  v-for="day in week" @click="addEvent(day.dayDate)" v-bind:class="['col-md-1', [0,6].includes(day.dayWeek)?'week-end':'']">{{ day.dayNum }}</div>
+            <div  v-for="day in week" @click="addEvent(day.dayDate)" :class="['col-md-1', [0,6].includes(day.dayWeek)?'week-end':'']">{{ day.dayNum }}</div>
         </div>
     </div>
 </template>
 
 <script>
+    import Store from '@/Store'
     export default {
         name: "calendar",
         data(){
@@ -29,9 +41,12 @@
                 selectedMonth: undefined,
                 selectedYear: undefined,
                 lastDay: undefined,
-                firstDay: 0,
+                firstDay: 1,
                 months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-                days: []
+                days: [],
+                rooms: [],
+                store: Store
+
             }
         },
         methods:{
@@ -116,10 +131,19 @@
                 }else{
                     this.firstDay = 0
                 }
+                localStorage.setItem('firstDay', this.firstDay);
                 this.getDaysArray();
+            },
+            getRooms(){
+                axios.get('http://bookerclient.loc/api/room/allRooms')
+                    .then(response => {
+                        this.rooms = response.data
+                    })
             }
         },
         mounted(){
+            this.getRooms();
+            this.firstDay = localStorage.firstDay || 1;
             this.getCurrentMonth();
             this.getCurrentYear();
             this.getLastDay()
@@ -132,7 +156,7 @@
                 }else{
                     return  ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
                 }
-            }
+            },
         }
     }
 </script>

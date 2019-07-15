@@ -1,13 +1,13 @@
 <template>
     <div id="admin" class="container">
-        <button class="btn btn-primary" @click="addUser()">Add User</button>
-        <table class="table">
+        <table v-if="!error" class="table">
             <thead>
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">First</th>
                 <th scope="col">Last</th>
-                <th scope="col" colspan="2">Handle</th>
+                <th scope="col">Email</th>
+                <th scope="col" colspan="2">Action</th>
             </tr>
             </thead>
             <tbody>
@@ -21,6 +21,9 @@
             </tr>
             <tr v-else>
                 <td>Нет добавленых юзеров</td>
+            </tr>
+            <tr>
+                <td><button class="btn btn-primary" @click="addUser()">Add User</button></td>
             </tr>
             </tbody>
         </table>
@@ -49,20 +52,24 @@
             },
             deleteUser(login){
                 axios
-                    .delete('http://booker-client.loc/api/admin/user/'+login)
+                    .delete('http://bookerclient.loc/api/admin/user/'+login)
                     .then(response => {
                         if(response.data.rowsCount == 'null'){
                             this.error = 'Unknown user'
                         }else{
                             this.getUsers();
                         }
-                    }).catch(error => console.log(error));
+                    }).catch(error => console.log(error.response.status));
             },
             getUsers(){
-                axios.get('http://booker-client.loc/api/admin/allUsers/'+this.store.user.login+'/'+this.store.user.token)
+                axios.get('http://bookerclient.loc/api/admin/allUsers/'+this.store.user.login+'/'+this.store.user.token)
                     .then(response => {
                             this.users = response.data
-                    }).catch(error => console.log(error))
+                    }).catch(error => {
+                        if(error.response.status == 401){
+                            this.error = 'You are not Admin'
+                        }
+                    })
             }
         },
         created(){

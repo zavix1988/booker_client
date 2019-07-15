@@ -32,7 +32,7 @@
     methods: {
       login(){
         axios
-        .put('http://booker-client.loc/api/user/login', 'login='+this.form.login
+        .put('http://bookerclient.loc/api/user/login', 'login='+this.form.login
                                                                                 +'&password='+this.form.password)
         .then(response => {
             if(response.data.token == false){
