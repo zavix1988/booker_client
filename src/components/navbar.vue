@@ -3,6 +3,7 @@
         <h5 class="my-0 mr-md-auto font-weight-normal">Broadboard Booker</h5>
         <nav class="my-2 my-md-0 mr-md-3">
             <router-link class="p-2 text-dark" to="/">Calendar</router-link>
+            <router-link v-if="store.user.login == 'admin'" class="p-2 text-dark" to="/admin">Admin panel</router-link>
 
         </nav>
         <router-link v-if="store.user.login == 'guest'" to="/login" class="btn btn-outline-primary" >Sign up</router-link>
@@ -24,7 +25,7 @@
         methods:{
             logout(){
                 axios
-                    .put('http://bookerclient.loc/api/user/logout', 'login='+this.store.user.login+'&token='+this.store.user.token)
+                    .put('http://tc.geeksforless.net/~user12/bookerclient/api/user/logout', 'login='+this.store.user.login+'&token='+this.store.user.token)
                     .then(response => {
                         if(response.data.result == true){
                             localStorage.user = JSON.stringify({

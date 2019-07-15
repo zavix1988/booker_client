@@ -8,6 +8,7 @@ export default new Vue({
                 token: undefined,
                 role: undefined,
             },
+            currentRoom: undefined,
         }
     },
     methods: {

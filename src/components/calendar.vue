@@ -6,8 +6,8 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="rooms">Select room</label>
-                    <select class="form-control" id="rooms">
-                        <option v-for="room in rooms">{{room.name}}</option>
+                    <select class="form-control" id="rooms" v-model="store.currentRoom" @change="getEvents">
+                        <option v-for="room in rooms" :value="room.id" >{{room.name}}</option>
                     </select>
                 </div>
             </div>
@@ -26,7 +26,7 @@
         </div>
         <div class="row" v-for="week in days">
             <div class="col-md-2"></div>
-            <div  v-for="day in week" @click="addEvent(day.dayDate)" :class="['col-md-1', [0,6].includes(day.dayWeek)?'week-end':'']">{{ day.dayNum }}</div>
+            <div v-for="day in week" @click="addEvent(day.dayDate)" :class="['col-md-1 dayInWeek', [0,6].includes(day.dayWeek)?'week-end':'']">{{ day.dayNum }}</div>
         </div>
     </div>
 </template>
@@ -122,6 +122,7 @@
                 if((typeof date) != 'undefined'){
                     if(!(date.getDay() == 0 || date.getDay()==6))
                         console.log(date)
+                        console.log(this.store.currentRoom)
                 }
             },
             changeFormat()
@@ -135,10 +136,13 @@
                 this.getDaysArray();
             },
             getRooms(){
-                axios.get('http://bookerclient.loc/api/room/allRooms')
+                axios.get('http://tc.geeksforless.net/~user12/bookerclient/api/room/allRooms')
                     .then(response => {
                         this.rooms = response.data
                     })
+            },
+            getEvents(){
+
             }
         },
         mounted(){
@@ -164,6 +168,10 @@
 <style scoped>
 .center{
     text-align: center
+}
+.dayInWeek{
+    width: 30px;
+    height: 30px
 }
 .week-end{
     background: red
