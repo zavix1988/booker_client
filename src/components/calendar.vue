@@ -28,6 +28,7 @@
             <div class="col-md-2"></div>
             <div v-for="day in week" @click="addEvent(day.dayDate)" :class="['col-md-1 dayInWeek', [0,6].includes(day.dayWeek)?'week-end':'']">{{ day.dayNum }}</div>
         </div>
+        {{events}}
     </div>
 </template>
 
@@ -136,7 +137,7 @@
                 this.getDaysArray();
             },
             getRooms(){
-                axios.get('http://tc.geeksforless.net/~user12/bookerclient/api/room/allRooms')
+                axios.get('http://bookerclient.loc/api/room/allRooms')
                     .then(response => {
                         this.rooms = response.data
                     })
@@ -161,6 +162,13 @@
                     return  ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
                 }
             },
+            events(){
+                let events;
+                axios
+                    .get('http://booker.loc/api/event/roomevents/'+this.store.currentRoom)
+                    .then(response => (events = response.data))
+                return
+            }
         }
     }
 </script>
