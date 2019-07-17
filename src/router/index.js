@@ -5,7 +5,7 @@ import Login from '@/components/Login'
 import Admin from '@/components/Admin'
 import addUser from '@/components/addUser'
 import editUser from '@/components/editUser'
-import bookIt from '@/components/bookIt'
+import setEvent from '@/components/setEvent'
 
 Vue.use(Router)
 
@@ -38,8 +38,8 @@ export default new Router({
     },
     {
       path: '/bookit',
-      name: 'bookIt',
-      component: bookIt
+      name: 'setEvent',
+      component: setEvent
     }
   ]
 })

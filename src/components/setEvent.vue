@@ -1,5 +1,5 @@
 <template>
-    <div id="bookIt" class="container">
+    <div id="setEvent" class="container">
         h1
         <form>
 
@@ -11,7 +11,7 @@
 import Store from '@/Store'
 
 export default {
-    name: "bookIt",
+    name: "setEvent",
     data(){
         return{
             store: Store

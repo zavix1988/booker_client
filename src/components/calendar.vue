@@ -2,7 +2,8 @@
     <div id="calendar">
         <h2>Calendar</h2>
         <div class="row">
-            <div class="col-md-6"><button @click="changeFormat">Change Format</button></div>
+            <div class="col-md-2"><button @click="changeFormat">Change Format</button></div>
+            <div class="col-md-4"><button @click="changeTimeFormat">{{ timeFormat }}</button></div>
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="rooms">Select room</label>
@@ -28,7 +29,6 @@
             <div class="col-md-2"></div>
             <div v-for="day in week" @click="addEvent(day.dayDate)" :class="['col-md-1 dayInWeek', [0,6].includes(day.dayWeek)?'week-end':'']">{{ day.dayNum }}</div>
         </div>
-        {{events}}
     </div>
 </template>
 
@@ -43,11 +43,12 @@
                 selectedYear: undefined,
                 lastDay: undefined,
                 firstDay: 1,
+                timeFormat: 24,
                 months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                 days: [],
                 rooms: [],
                 store: Store,
-                events: undefined
+                events: []
             }
         },
         methods:{
@@ -69,6 +70,7 @@
                 }
                 this.getLastDay()
                 this.getDaysArray()
+                this.getEvents()
             },
             prevMonth()
             {
@@ -80,6 +82,7 @@
                 }
                 this.getLastDay()
                 this.getDaysArray()
+                this.getEvents()
             },
             getLastDay()
             {
@@ -144,7 +147,20 @@
                     })
             },
             getEvents(){
+                if(this.store.currentRoom){
+                    axios
+                        .get('http://booker-client.loc/api/event/roomevents/'+this.store.currentRoom+'/'+this.selectedMonth+'/'+this.selectedYear)
+                        .then(response => (this.events = response.data))
 
+                }
+            },
+            changeTimeFormat() {
+                if(this.timeFormat == 24)
+                {
+                    this.timeFormat = 12;
+                } else {
+                    this.timeFormat = 24;
+                }
             }
         },
         mounted(){
@@ -163,16 +179,7 @@
                     return  ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
                 }
             },
-            events(){
-                if(this.store.currentRoom){
-                    let events;
-                    axios
-                        .get('http://booker-client.loc/api/event/roomevents/'+this.store.currentRoom+'/'+this.selectedMonth+'/'+this.selectedYear)
-                        .then(response => (events = response.data))
 
-                    return events;
-                }
-            }
         }
     }
 </script>
