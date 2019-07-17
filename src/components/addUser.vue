@@ -52,7 +52,7 @@ export default {
         register(){
             if(this.form.password == this.form.retry){
             axios
-                .post('http://booker-client.loc/api/admin/register/', 'login='+this.form.login
+                .post('http://tc.geeksforless.net/~user12/bookerclient/api/admin/register/', 'login='+this.form.login
                                                                                         +'&password='+this.form.password
                                                                                         +'&retry='+this.form.retry
                                                                                         +'&first_name='+this.form.first_name

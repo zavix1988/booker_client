@@ -52,7 +52,7 @@
             },
             deleteUser(login){
                 axios
-                    .delete('http://booker-client.loc/api/admin/user/'+login)
+                    .delete('http://tc.geeksforless.net/~user12/bookerclient/api/admin/user/'+login)
                     .then(response => {
                         if(response.data.rowsCount == 'null'){
                             this.error = 'Unknown user'
@@ -62,7 +62,7 @@
                     }).catch(error => console.log(error.response.status));
             },
             getUsers(){
-                axios.get('http://booker-client.loc/api/admin/allUsers/'+this.store.user.login+'/'+this.store.user.token)
+                axios.get('http://tc.geeksforless.net/~user12/bookerclient/api/admin/allUsers/'+this.store.user.login+'/'+this.store.user.token)
                     .then(response => {
                             this.users = response.data
                     }).catch(error => {

@@ -27,7 +27,7 @@
         </div>
         <div class="row" v-for="week in days">
             <div class="col-md-2"></div>
-            <div v-for="day in week" @click="addEvent(day.dayDate)" :class="['col-md-1 dayInWeek', [0,6].includes(day.dayWeek)?'week-end':'']">{{ day.dayNum }}</div>
+            <div v-for="day in week" @click="addEvent(day.dayDate)" :class="['col-md-1', [0,6].includes(day.dayWeek)?'week-end':'work-day']">{{ day.dayNum }}</div>
         </div>
     </div>
 </template>
@@ -115,11 +115,13 @@
                 this.formatFirstWeek()
             },
             formatFirstWeek() {
-                for (let i = this.days[0].length; i < 7; i++) {
-                    this.days[0].unshift({
-                        dayNum: undefined,
-                        dayWeek: undefined
-                    });
+                if(this.days[0].length > 0){
+                    for (let i = this.days[0].length; i < 7; i++) {
+                        this.days[0].unshift({
+                            dayNum: undefined,
+                            dayWeek: undefined
+                        });
+                    }
                 }
             },
             addEvent(date){
@@ -141,7 +143,7 @@
                 this.getDaysArray();
             },
             getRooms(){
-                axios.get('http://booker-client.loc/api/room/allRooms')
+                axios.get('http://tc.geeksforless.net/~user12/bookerclient/api/room/allRooms')
                     .then(response => {
                         this.rooms = response.data
                     })
@@ -149,7 +151,7 @@
             getEvents(){
                 if(this.store.currentRoom){
                     axios
-                        .get('http://booker-client.loc/api/event/roomevents/'+this.store.currentRoom+'/'+this.selectedMonth+'/'+this.selectedYear)
+                        .get('http://tc.geeksforless.net/~user12/bookerclient/api/event/roomevents/'+this.store.currentRoom+'/'+this.selectedMonth+'/'+this.selectedYear)
                         .then(response => (this.events = response.data))
 
                 }
@@ -188,12 +190,17 @@
 .center{
     text-align: center
 }
-.dayInWeek{
-    width: 30px;
-    height: 30px
+.work-day{
+    background:gray;
+    width: 70px;
+    height: 70px;
+    margin: 2px
 }
 .week-end{
-    background: red
+    background: red;
+    width: 70px;
+    height: 70px;
+    margin: 2px
 }
 
 </style>
