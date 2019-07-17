@@ -46,8 +46,8 @@
                 months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                 days: [],
                 rooms: [],
-                store: Store
-
+                store: Store,
+                events: undefined
             }
         },
         methods:{
@@ -124,6 +124,7 @@
                     if(!(date.getDay() == 0 || date.getDay()==6))
                         console.log(date)
                         console.log(this.store.currentRoom)
+                        console.log(this.store.user.login)
                 }
             },
             changeFormat()
@@ -137,7 +138,7 @@
                 this.getDaysArray();
             },
             getRooms(){
-                axios.get('http://bookerclient.loc/api/room/allRooms')
+                axios.get('http://booker-client.loc/api/room/allRooms')
                     .then(response => {
                         this.rooms = response.data
                     })
@@ -163,11 +164,14 @@
                 }
             },
             events(){
-                let events;
-                axios
-                    .get('http://booker.loc/api/event/roomevents/'+this.store.currentRoom)
-                    .then(response => (events = response.data))
-                return
+                if(this.store.currentRoom){
+                    let events;
+                    axios
+                        .get('http://booker-client.loc/api/event/roomevents/'+this.store.currentRoom+'/'+this.selectedMonth+'/'+this.selectedYear)
+                        .then(response => (events = response.data))
+
+                    return events;
+                }
             }
         }
     }
