@@ -6,4 +6,4 @@
 
 RewriteEngine On
 RewriteBase /api/
-RewriteRule (.*) http://booker-serv.loc/api/$1 [P]
+RewriteRule (.*) http://booker.loc/api/$1 [P]

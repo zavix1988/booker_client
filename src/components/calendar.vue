@@ -2,38 +2,55 @@
     <div id="calendar">
         <h2>Calendar</h2>
         <div class="row">
-            <div class="col-md-2"><button @click="changeFormat">Change Format</button></div>
-            <div class="col-md-4"><button @click="changeTimeFormat">{{ timeFormat }}</button></div>
-            <div class="col-md-6">
+            <div class="col-md-10">
+                <table id="cal" class="table table-bordered">
+                    <thead class="center">
+                        <tr>
+                            <td><b-button @click="prevMonth" variant="primary" class="btn-switch"> << </b-button></td>
+                            <td colspan="5">{{ months[selectedMonth] }} {{ selectedYear }}</td>
+                            <td><b-button @click="nextMonth" variant="primary" class="btn-switch"> >> </b-button></td>
+                        </tr>
+                        <tr>
+                            <td v-for="weekDay in week">{{ weekDay }}</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="week in days">
+                            <td v-for="day in week" :class="['col-md-1', [0,6].includes(day.dayWeek)?'week-end':'work-day']"> {{ day.dayNum }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-2">
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="weekFormat" @click="changeFormat" v-if="weekFormat == 'RU'">
+                    <input type="checkbox" class="custom-control-input" id="weekFormat" @click="changeFormat" v-else checked>
+                    <label class="custom-control-label" for="weekFormat">Week started: <b>({{weekFormat}})</b></label>
+                </div>
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="timeFormat" @click="changeTimeFormat" v-if="timeFormat == 24">
+                    <input type="checkbox" class="custom-control-input" id="timeFormat" @click="changeTimeFormat" v-else checked>
+                    <label class="custom-control-label" for="timeFormat">Time format: <b>({{ timeFormat }})</b></label>
+                </div>
                 <div class="form-group">
                     <label for="rooms">Select room</label>
                     <select class="form-control" id="rooms" v-model="store.currentRoom" @change="getEvents">
                         <option v-for="room in rooms" :value="room.id" >{{room.name}}</option>
                     </select>
                 </div>
+                <b-form-group>
+                    <b-button @click="toCurrentMonth" variant="outline-secondary">Current Month</b-button>
+                </b-form-group>
+                <setEvent :time-format="timeFormat" :now-date="date"/>
             </div>
-        </div>
-
-        
-        <div class="row">
-            <div class="col-md-2"><button @click="prevMonth">-</button></div>
-            <div class="col-md-8 center">{{ months[selectedMonth] }} {{ selectedYear }}</div>
-            <div class="col-md-2"><button @click="nextMonth">+</button></div>
-        
-        </div>
-        <div class="row">
-            <div class="col-md-2"></div>
-            <div class="col-md-1" v-for="weekDay in week">{{ weekDay }}</div>
-        </div>
-        <div class="row" v-for="week in days">
-            <div class="col-md-2"></div>
-            <div v-for="day in week" @click="addEvent(day.dayDate)" :class="['col-md-1', [0,6].includes(day.dayWeek)?'week-end':'work-day']">{{ day.dayNum }}</div>
         </div>
     </div>
 </template>
 
 <script>
     import Store from '@/Store'
+    import setEvent from './setEvent'
+
     export default {
         name: "calendar",
         data(){
@@ -42,7 +59,8 @@
                 selectedMonth: undefined,
                 selectedYear: undefined,
                 lastDay: undefined,
-                firstDay: 1,
+                firstDay: undefined,
+                weekFormat: undefined,
                 timeFormat: 24,
                 months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                 days: [],
@@ -136,14 +154,17 @@
             {
                 if(this.firstDay == 0){
                     this.firstDay = 1
+                    this.weekFormat = 'Mon'
                 }else{
                     this.firstDay = 0
+                    this.weekFormat = 'Sun'
                 }
                 localStorage.setItem('firstDay', this.firstDay);
+                localStorage.setItem('weekFormat', this.weekFormat);
                 this.getDaysArray();
             },
             getRooms(){
-                axios.get('http://tc.geeksforless.net/~user12/bookerclient/api/room/allRooms')
+                axios.get('http://bookerclient.loc/api/room/allRooms')
                     .then(response => {
                         this.rooms = response.data
                     })
@@ -151,7 +172,7 @@
             getEvents(){
                 if(this.store.currentRoom){
                     axios
-                        .get('http://tc.geeksforless.net/~user12/bookerclient/api/event/roomevents/'+this.store.currentRoom+'/'+this.selectedMonth+'/'+this.selectedYear)
+                        .get('http://bookerclient.loc/api/event/roomevents/'+this.store.currentRoom+'/'+this.selectedMonth+'/'+this.selectedYear)
                         .then(response => (this.events = response.data))
 
                 }
@@ -163,11 +184,17 @@
                 } else {
                     this.timeFormat = 24;
                 }
+            },
+            toCurrentMonth(){
+                this.getCurrentMonth();
+                this.getCurrentYear();
+                this.getDaysArray();
             }
         },
         mounted(){
             this.getRooms();
             this.firstDay = localStorage.firstDay || 1;
+            this.weekFormat = localStorage.weekFormat || 'Mon';
             this.getCurrentMonth();
             this.getCurrentYear();
             this.getLastDay()
@@ -176,9 +203,9 @@
         computed:{
             week(){
                 if(this.firstDay == 0){
-                    return ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб']
+                    return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
                 }else{
-                    return  ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+                    return  ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
                 }
             },
 
@@ -191,13 +218,13 @@
     text-align: center
 }
 .work-day{
-    background:gray;
+    background: #d8d8d8;
     width: 70px;
     height: 70px;
     margin: 2px
 }
 .week-end{
-    background: red;
+    background: #f15e5e;
     width: 70px;
     height: 70px;
     margin: 2px

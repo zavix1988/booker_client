@@ -10,12 +10,14 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 import calendar from './components/calendar'
 import navbar from './components/navbar'
+import setEvent from './components/setEvent'
 
 Vue.use(BootstrapVue)
 Vue.config.productionTip = false
 
 Vue.component('calendar', calendar)
 Vue.component('navbar', navbar)
+Vue.component('setEvent', setEvent)
 
 /* eslint-disable no-new */
 new Vue({
