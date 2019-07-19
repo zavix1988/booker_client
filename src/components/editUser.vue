@@ -51,7 +51,7 @@
         methods: {
             update(){
                axios
-                   .put('http://bookerclient.loc/api/admin/updateUser', 'user='+this.store.user.login
+                   .put('http://tc.geeksforless.net/~user12/bookerclient/api/admin/updateUser', 'user='+this.store.user.login
                                                                           +'&token='+this.store.user.token
                                                                           +'&login='+this.$route.params.login
                                                                           +'&password='+this.form.password
@@ -70,7 +70,7 @@
             },
             getUser(){
                 axios
-                    .get('http://bookerclient.loc/api/admin/user/'+this.$route.params.login+'/'+this.store.user.login+'/'+this.store.user.token)
+                    .get('http://tc.geeksforless.net/~user12/bookerclient/api/admin/user/'+this.$route.params.login+'/'+this.store.user.login+'/'+this.store.user.token)
                     .then(response=>{
                         if(response.data){
                             this.form.email = response.data.email;

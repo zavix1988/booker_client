@@ -32,7 +32,7 @@
     methods: {
       login(){
         axios
-        .put('http://bookerclient.loc/api/user/login', 'login='+this.form.login
+        .put('http://tc.geeksforless.net/~user12/bookerclient/api/user/login', 'login='+this.form.login
                                                                                 +'&password='+this.form.password)
         .then(response => {
             if(response.data.token == false){
@@ -43,7 +43,6 @@
                 this.store.user.role = response.data.role;
                 if(response.data.role == 'admin'){
                     this.$router.push({name: 'Admin'})
-
                 }else{
                     this.$router.push({name: 'Hello'})
 

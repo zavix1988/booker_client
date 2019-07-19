@@ -174,8 +174,8 @@
 
             }
         },
-        validateForm: function() {
-            console.log(this.form);
+        validateForm: function(e) {
+            e.preventDefault();
             if (!this.form.dateStart) {
                 this.error = "Please, choose the correct date!";
                 return;
@@ -206,10 +206,7 @@
             } else {
                 return;
             }
-            if (this.form.description.length <= 0) {
-                this.error = "Desctiption is required field";
-                return;
-            }
+
             if (this.recurrence) {
                 if(this.form.recurring == 'weekly' && this.form.duration > 4 || this.form.duration < 1) {
                     this.error = "Weekly duration cannot be more than 4";
@@ -224,7 +221,19 @@
                     return;
                 }
             }
-
+            axios.post('http://tc.geeksforless.net/~user12/bookerclient/api/event/roomEvent', 
+                                                                    'login='+this.store.user.login+
+                                                                    '&token='+this.store.user.token+
+                                                                    '&user='+this.form.user+
+                                                                    '&date='+this.form.dateStart+
+                                                                    '&hoursStart='+hoursStart+
+                                                                    '&minutesStart='+this.form.minutesStart+
+                                                                    '&hoursEnd='+hoursEnd+
+                                                                    '&minutesEnd='+this.form.minutesEnd+
+                                                                    '&description='+this.form.description
+            )
+                .then(response=>(console.log(response.data)))
+            
             this.$nextTick(() => {
                 this.$refs.modal.hide()
             })
@@ -292,7 +301,7 @@
 
             if (this.store.user.role == 'admin'){
                 axios
-                    .get('http://bookerclient.loc/api/admin/allUsers/'+this.store.user.login+'/'+this.store.user.token)
+                    .get('http://tc.geeksforless.net/~user12/bookerclient/api/admin/allUsers/'+this.store.user.login+'/'+this.store.user.token)
                     .then(response => {
                         this.users = response.data
                     }).catch(error => {
