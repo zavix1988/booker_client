@@ -16,7 +16,13 @@
                     </thead>
                     <tbody>
                         <tr v-for="week in days">
-                            <td v-for="day in week" :class="['col-md-1', [0,6].includes(day.dayWeek)?'week-end':'work-day']"> {{ day.dayNum }}</td>
+                            <td v-for="day in week" :class="['col-md-1', [0,6].includes(day.dayWeek)?'week-end':'work-day']"> {{ day.dayNum }}
+                                <b-list-group>
+                                    <b-list-group-item :key="index" v-for="(event, index) in events" v-if="new Date(+event.startEvent).getDate() == day.dayNum" size="sm" variant="primary" class="mb-1 p-0 border-0 text-center event-badge" v-b-modal.my-modal @click="getEventById(index)"><small>
+                                        {{event.startHour}}:{{event.startMinutes}} {{event.ampmStart}} - {{event.endHour}}:{{event.endMinutes}} {{event.ampmEnd}}</small>
+                                    </b-list-group-item>
+                                </b-list-group>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -41,7 +47,7 @@
                 <b-form-group>
                     <b-button @click="toCurrentMonth" variant="outline-secondary">Current Month</b-button>
                 </b-form-group>
-                <setEvent :time-format="timeFormat" :now-date="date"/>
+                <setEvent v-if="store.currentRoom" :time-format="timeFormat" :now-date="date"/>
             </div>
         </div>
     </div>
@@ -61,7 +67,7 @@
                 lastDay: undefined,
                 firstDay: undefined,
                 weekFormat: undefined,
-                timeFormat: 24,
+                timeFormat: undefined,
                 months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                 days: [],
                 rooms: [],
@@ -141,14 +147,7 @@
                         });
                     }
                 }
-            },
-            addEvent(date){
-                if((typeof date) != 'undefined'){
-                    if(!(date.getDay() == 0 || date.getDay()==6))
-                        console.log(date)
-                        console.log(this.store.currentRoom)
-                        console.log(this.store.user.login)
-                }
+                this.getEvents()
             },
             changeFormat()
             {
@@ -173,17 +172,60 @@
                 if(this.store.currentRoom){
                     axios
                         .get('http://bookerclient.loc/api/event/roomevents/'+this.store.currentRoom+'/'+this.selectedMonth+'/'+this.selectedYear)
-                        .then(response => (this.events = response.data))
+                        .then(response => {
+                            if(response.data.length > 0){
+                                response.data.forEach(event=>{
+                                    event.createdEvent += "000";
+                                    event.startEvent += "000";
+                                    event.endEvent += "000";
+                                    if (this.timeFormat == 24) {
+                                        event.startHour = new Date(+event.startEvent).getHours();
+                                        event.startMinutes = new Date(+event.startEvent).getMinutes();
+                                        if (event.startMinutes == 0) {
+                                            event.startMinutes = "00";
+                                        }
+                                        event.endHour = new Date(+event.endEvent).getHours();
+                                        event.endMinutes = new Date(+event.endEvent).getMinutes();
+                                        if (event.endMinutes == 0) {
+                                            event.endMinutes = "00";
+                                        }
+                                    } else {
+                                        event.startHour = new Date(+event.startEvent).getHours();
+                                        event.startMinutes = new Date(+event.startEvent).getMinutes();
+                                        event.ampmStart = event.startHour >= 12 ? 'pm' : 'am';
+                                        event.startHour = event.startHour % 12;
+                                        event.startHour = event.startHour ? event.startHour : 12;
+                                        event.startMinutes = new Date(+event.startEvent).getMinutes();
+                                        if (event.startMinutes == 0) {
+                                            event.startMinutes = "00";
+                                        }
+                                        event.endHour = new Date(+event.endEvent).getHours();
+                                        event.endMinutes = new Date(+event.endEvent).getMinutes();
+                                        event.ampmEnd = event.endHour >= 12 ? 'pm' : 'am';
+                                        event.endHour = event.endHour % 12;
+                                        event.endHour = event.endHour ? event.endHour : 12;
+                                        event.endMinutes = new Date(+event.endEvent).getMinutes();
+                                        if (event.endMinutes == 0) {
+                                            event.endMinutes = "00";
+                                        }
+                                    }
+
+                                });
+                                this.events = response.data;
+                                console.log(this.events);
+                            }else{
+                                console.log(false)
+                                this.events = []
+                            }
+                        })
+
 
                 }
             },
             changeTimeFormat() {
-                if(this.timeFormat == 24)
-                {
-                    this.timeFormat = 12;
-                } else {
-                    this.timeFormat = 24;
-                }
+                this.timeFormat = (this.timeFormat == 24) ? 12 : 24;
+                localStorage.setItem('timeFormat', this.timeFormat);
+                this.getEvents();
             },
             toCurrentMonth(){
                 this.getCurrentMonth();
@@ -195,6 +237,7 @@
             this.getRooms();
             this.firstDay = localStorage.firstDay || 1;
             this.weekFormat = localStorage.weekFormat || 'Mon';
+            this.timeFormat = localStorage.timeFormat || 24;
             this.getCurrentMonth();
             this.getCurrentYear();
             this.getLastDay()
@@ -219,8 +262,8 @@
 }
 .work-day{
     background: #d8d8d8;
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     margin: 2px
 }
 .week-end{
