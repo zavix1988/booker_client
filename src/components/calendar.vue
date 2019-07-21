@@ -163,7 +163,7 @@
                 this.getDaysArray();
             },
             getRooms(){
-                axios.get('http://tc.geeksforless.net/~user12/bookerclient/api/room/allRooms')
+                axios.get('http://booker-client.loc/api/room/allRooms')
                     .then(response => {
                         this.rooms = response.data
                     })
@@ -171,7 +171,7 @@
             getEvents(){
                 if(this.store.currentRoom){
                     axios
-                        .get('http://tc.geeksforless.net/~user12/bookerclient/api/event/roomevents/'+this.store.currentRoom+'/'+this.selectedMonth+'/'+this.selectedYear)
+                        .get('http://booker-client.loc/api/event/roomevents/'+this.store.currentRoom+'/'+this.selectedMonth+'/'+this.selectedYear)
                         .then(response => {
                             if(response.data.length > 0){
                                 response.data.forEach(event=>{

@@ -207,7 +207,8 @@
                 return;
             }
 
-            if (this.recurrence) {
+            if (this.recurrence)
+            {
                 if(this.form.recurring == 'weekly' && this.form.duration > 4 || this.form.duration < 1) {
                     this.error = "Weekly duration cannot be more than 4";
                     return;
@@ -221,17 +222,19 @@
                     return;
                 }
             }
-            axios.post('http://tc.geeksforless.net/~user12/bookerclient/api/event/roomEvent', 
-                                                                    'login='+this.store.user.login+
-                                                                    '&token='+this.store.user.token+
-                                                                    '&user='+this.form.user+
-                                                                    '&date='+this.form.dateStart+
-                                                                    '&hoursStart='+hoursStart+
-                                                                    '&minutesStart='+this.form.minutesStart+
-                                                                    '&hoursEnd='+hoursEnd+
-                                                                    '&minutesEnd='+this.form.minutesEnd+
-                                                                    '&description='+this.form.description
-            )
+            let params = 'login='+this.store.user.login+
+                '&token='+this.store.user.token+
+                '&user='+this.form.user+
+                '&room='+this.store.currentRoom+
+                '&dateStart='+correctDates.dateStart+
+                '&dateEnd='+correctDates.dateEnd+
+                '&description='+this.form.description
+
+            if(this.recurrence)
+            {
+                params += '&recurring='+this.form.recurring+'&duration='+this.form.duration;
+            }
+            axios.post('http://booker-client.loc/api/event/roomEvent', params)
                 .then(response=>(console.log(response.data)))
             
             this.$nextTick(() => {
@@ -243,20 +246,11 @@
         {
 
             let dateArr = date.split('-');
-            if (+dateArr[0] < 2019) {
+            if (+dateArr[0] < this.nowDate.getFullYear() && +dateArr[1] < this.nowDate.getMonth() && +dateArr[2] < this.nowDate.getDate()) {
                 this.error = "You might to select the current year or later";
                 return;
             }
-            if (+dateArr[1] > 12 || +dateArr[1] < 1) {
-                this.error = "You might to select correct month";
-                return;
-            }
-            if (+dateArr[0] > 2020) {
-                this.error = "The selected date is not soon";
-                return;
-            }
             return true;
-
         },
         switchRecurring()
         {
@@ -301,7 +295,7 @@
 
             if (this.store.user.role == 'admin'){
                 axios
-                    .get('http://tc.geeksforless.net/~user12/bookerclient/api/admin/allUsers/'+this.store.user.login+'/'+this.store.user.token)
+                    .get('http://booker-client.loc/api/admin/allUsers/'+this.store.user.login+'/'+this.store.user.token)
                     .then(response => {
                         this.users = response.data
                     }).catch(error => {

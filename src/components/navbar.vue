@@ -25,7 +25,7 @@
         methods:{
             logout(){
                 axios
-                    .put('http://tc.geeksforless.net/~user12/bookerclient/api/user/logout', 'login='+this.store.user.login+'&token='+this.store.user.token)
+                    .put('http://booker-client.loc/api/user/logout', 'login='+this.store.user.login+'&token='+this.store.user.token)
                     .then(response => {
                         if(response.data.result == true){
                             localStorage.user = JSON.stringify({
