@@ -26,6 +26,37 @@
                         </tr>
                     </tbody>
                 </table>
+                <b-modal id="my-modal" title="Event details" hide-footer v-if="selectedEvent != undefined" >
+                    <table class="table">
+                        <tbody>
+                        <tr>
+                            <th scope="row">When</th>
+                            <td><small>Starts at</small> {{events[selectedEvent].startHour}}:{{events[selectedEvent].startMinutes}} {{events[selectedEvent].ampmStart}}</td>
+                            <td><small>Ends at</small> {{events[selectedEvent].endHour}}:{{events[selectedEvent].endMinutes}} {{events[selectedEvent].ampmEnd}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Notes</th>
+                            <td colspan="2">{{events[selectedEvent].note}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Who</th>
+                            <td colspan="2">{{events[selectedEvent].first_name}} {{events[selectedEvent].last_name}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="modal-footer">
+                        <button v-b-modal.delete-modal @click="$bvModal.hide('my-modal')" type="button" class="btn btn-outline-danger">Delete</button>
+                        <router-link :to="'/edit/' + events[selectedEvent].id" class="btn btn-primary">Update</router-link>
+                    </div>
+                </b-modal>
+
+                <b-modal id="delete-modal" title="Delete event" hide-footer v-if="selectedEvent != undefined">
+                    <p>Are you sure you want to delete this event?</p>
+                    <div class="modal-footer">
+                        <button type="button" @click="deleteEvent()" class="btn btn-primary float-right">Ok</button>
+                    </div>
+                </b-modal>
+
             </div>
             <div class="col-md-2">
                 <div class="custom-control custom-switch">
@@ -72,7 +103,8 @@
                 days: [],
                 rooms: [],
                 store: Store,
-                events: []
+                events: [],
+                selectedEvent: undefined
             }
         },
         methods:{
@@ -121,7 +153,6 @@
                     if (new Date(this.selectedYear, this.selectedMonth, i).getDay() != this.firstDay) {
                         this.days[week].push({
                             dayNum: i,
-                            dayDate: new Date(this.selectedYear, this.selectedMonth, i),
                             dayWeek: new Date(this.selectedYear, this.selectedMonth, i).getDay()
                         })
                     } else {
@@ -131,7 +162,6 @@
                         }
                         this.days[week].push({
                             dayNum: i,
-                            dayDate: new Date(this.selectedYear, this.selectedMonth, i),
                             dayWeek: new Date(this.selectedYear, this.selectedMonth, i).getDay()
                         })
                     }
@@ -163,7 +193,7 @@
                 this.getDaysArray();
             },
             getRooms(){
-                axios.get('http://booker-client.loc/api/room/allRooms')
+                axios.get('http://bookerclient.loc/api/room/allRooms')
                     .then(response => {
                         this.rooms = response.data
                     })
@@ -171,7 +201,7 @@
             getEvents(){
                 if(this.store.currentRoom){
                     axios
-                        .get('http://booker-client.loc/api/event/roomevents/'+this.store.currentRoom+'/'+this.selectedMonth+'/'+this.selectedYear)
+                        .get('http://bookerclient.loc/api/event/roomevents/'+this.store.currentRoom+'/'+this.selectedMonth+'/'+this.selectedYear)
                         .then(response => {
                             if(response.data.length > 0){
                                 response.data.forEach(event=>{
@@ -216,9 +246,19 @@
                                 this.events = []
                             }
                         })
-
-
                 }
+            },
+            deleteEvent: function() {
+                console.log(this.events[this.selectedEvent])
+                axios
+                    .delete('http://bookerclient.loc/api/event/roomEvent/'+this.events[this.selectedEvent].id+'/'+this.store.user.login+'/'+this.store.user.token)
+                    .then(response=>{
+                        if(response.data.result == 'success'){
+                            this.getEvents();
+                        }
+                    })
+                this.getEvents();
+                this.$bvModal.hide('delete-modal');
             },
             changeTimeFormat() {
                 this.timeFormat = (this.timeFormat == 24) ? 12 : 24;
@@ -229,6 +269,9 @@
                 this.getCurrentMonth();
                 this.getCurrentYear();
                 this.getDaysArray();
+            },
+            getEventById(id){
+                this.selectedEvent = id;
             }
         },
         mounted(){

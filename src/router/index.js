@@ -6,6 +6,7 @@ import Admin from '@/components/Admin'
 import addUser from '@/components/addUser'
 import editUser from '@/components/editUser'
 import setEvent from '@/components/setEvent'
+import editEvent from '@/components/editEvent'
 
 Vue.use(Router)
 
@@ -40,6 +41,11 @@ export default new Router({
       path: '/bookit',
       name: 'setEvent',
       component: setEvent
+    },
+    {
+      path: '/edit/:id',
+      name: 'editEvent',
+      component: editEvent
     }
   ]
 })

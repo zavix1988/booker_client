@@ -153,12 +153,10 @@
         }
     },
     methods: {
-        resetDuration()
-        {
+        resetDuration() {
             this.form.duration = 1;
         },
-        resetModal()
-        {
+        resetModal() {
             this.form = {
                 user: undefined,
                 dateStart: undefined,
@@ -174,7 +172,7 @@
 
             }
         },
-        validateForm: function(e) {
+        validateForm: function (e) {
             e.preventDefault();
             if (!this.form.dateStart) {
                 this.error = "Please, choose the correct date!";
@@ -189,17 +187,17 @@
                 this.error = "Events aviable only on 8 a.m. till 9 p.m.";
                 return;
             }
-            if(!hoursStart) {
+            if (!hoursStart) {
                 this.error = "Please, choose the correct start time";
                 return;
             }
-            if(!hoursEnd) {
+            if (!hoursEnd) {
                 this.error = "Please, choose the correct ending time";
                 return;
             }
             let correctDates = this.standartizeDate(this.form.dateStart, hoursStart, this.form.minutesStart, hoursEnd, this.form.minutesEnd);
-            if(correctDates) {
-                if(correctDates.dateStart > correctDates.dateEnd){
+            if (correctDates) {
+                if (correctDates.dateStart > correctDates.dateEnd) {
                     this.error = "The event cannot end before it starts";
                     return;
                 }
@@ -207,43 +205,40 @@
                 return;
             }
 
-            if (this.recurrence)
-            {
-                if(this.form.recurring == 'weekly' && this.form.duration > 4 || this.form.duration < 1) {
+            if (this.recurrence) {
+                if (this.form.recurring == 'weekly' && this.form.duration > 4 || this.form.duration < 1) {
                     this.error = "Weekly duration cannot be more than 4";
                     return;
                 }
-                if(this.form.recurring == 'bi-weekly' && this.form.duration > 2 || this.form.duration < 1) {
+                if (this.form.recurring == 'bi-weekly' && this.form.duration > 2 || this.form.duration < 1) {
                     this.error = "Bi-weekly duration cannot be more than 2";
                     return;
                 }
-                if(this.form.recurring == 'monthly' && this.form.duration != 1) {
+                if (this.form.recurring == 'monthly' && this.form.duration != 1) {
                     this.error = "Monthly duration cannot be more than 1";
                     return;
                 }
             }
-            let params = 'login='+this.store.user.login+
-                '&token='+this.store.user.token+
-                '&user='+this.form.user+
-                '&room='+this.store.currentRoom+
-                '&dateStart='+correctDates.dateStart+
-                '&dateEnd='+correctDates.dateEnd+
-                '&description='+this.form.description
+            let params = 'login=' + this.store.user.login +
+                '&token=' + this.store.user.token +
+                '&user=' + this.form.user +
+                '&room=' + this.store.currentRoom +
+                '&dateStart=' + correctDates.dateStart +
+                '&dateEnd=' + correctDates.dateEnd +
+                '&description=' + this.form.description
 
-            if(this.recurrence)
-            {
-                params += '&recurring='+this.form.recurring+'&duration='+this.form.duration;
+            if (this.recurrence) {
+                params += '&recurring=' + this.form.recurring + '&duration=' + this.form.duration;
             }
-            axios.post('http://booker-client.loc/api/event/roomEvent', params)
-                .then(response=>(console.log(response.data)))
-            
+            axios.post('http://bookerclient.loc/api/event/roomEvent', params)
+                .then(response => (console.log(response.data)))
+
             this.$nextTick(() => {
                 this.$refs.modal.hide()
             })
 
         },
-        validateDate(date)
-        {
+        validateDate(date) {
 
             let dateArr = date.split('-');
             if (+dateArr[0] < this.nowDate.getFullYear() && +dateArr[1] < this.nowDate.getMonth() && +dateArr[2] < this.nowDate.getDate()) {
@@ -252,18 +247,17 @@
             }
             return true;
         },
-        switchRecurring()
-        {
+        switchRecurring() {
             this.recurrence = !this.recurrence
         },
         standartizeDate(date, hoursStart, minutesStart, hoursEnd, minutesEnd) {
             let result = {};
             let dateArr = date.split('-');
-            if(hoursStart && minutesStart) {
+            if (hoursStart && minutesStart) {
                 var dateStart = new Date(dateArr[0], dateArr[1] - 1, dateArr[2], hoursStart, minutesStart);
             }
 
-            if(hoursEnd && minutesEnd) {
+            if (hoursEnd && minutesEnd) {
                 var dateEnd = new Date(dateArr[0], dateArr[1] - 1, dateArr[2], hoursEnd, minutesEnd);
             }
             if (!this.checkHolidays(dateStart) || !this.checkHolidays(dateEnd)) {
@@ -273,7 +267,7 @@
                 this.error = "You can not create event before current time!";
                 return;
             }
-            if(dateStart && dateEnd) {
+            if (dateStart && dateEnd) {
                 result.dateStart = dateStart.getTime() / 1000;
                 result.dateEnd = dateEnd.getTime() / 1000;
                 return result;
@@ -290,25 +284,24 @@
             }
             return hours;
         },
-        getUsers()
-        {
+        getUsers() {
 
-            if (this.store.user.role == 'admin'){
+            if (this.store.user.role == 'admin') {
                 axios
-                    .get('http://booker-client.loc/api/admin/allUsers/'+this.store.user.login+'/'+this.store.user.token)
+                    .get('http://bookerclient.loc/api/admin/allUsers/' + this.store.user.login + '/' + this.store.user.token)
                     .then(response => {
                         this.users = response.data
                     }).catch(error => {
-                        if(error.response.status == 401){
-                            this.error = 'You are not Admin'
-                        }
-                    })
+                    if (error.response.status == 401) {
+                        this.error = 'You are not Admin'
+                    }
+                })
             } else {
                 this.users.push(this.store.user)
             }
         },
-        checkHolidays: function(date) {
-            if([0,6].includes(date.getDay())) {
+        checkHolidays: function (date) {
+            if ([0, 6].includes(date.getDay())) {
                 this.error = "Weekend";
                 return;
             }
