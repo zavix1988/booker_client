@@ -53,7 +53,8 @@
                 <b-modal id="delete-modal" title="Delete event" hide-footer v-if="selectedEvent != undefined">
                     <p>Are you sure you want to delete this event?</p>
                     <div class="modal-footer">
-                        <button type="button" @click="deleteEvent()" class="btn btn-primary float-right">Ok</button>
+                        <button type="button" @click="deleteEvent(false)" class="btn btn-primary float-right">Delete</button>
+                        <button type="button" v-if="events[selectedEvent].parent" @click="deleteEvent(true)" class="btn btn-primary float-right">Delete with recurrences</button>
                     </div>
                 </b-modal>
 
@@ -242,27 +243,38 @@
 
                                 });
                                 this.events = response.data;
+                                console.log(this.events)
                             }else{
                                 this.events = []
                             }
                         })
                 }
             },
-            deleteEvent: function() {
-                console.log(this.events[this.selectedEvent])
-                axios
-                    .delete('http://bookerclient.loc/api/event/roomEvent/'+this.events[this.selectedEvent].id+'/'+this.store.user.login+'/'+this.store.user.token)
-                    .then(response=>{
-                        if(response.data.result == 'success'){
-                            this.getEvents();
-                        }
-                    })
-                this.getEvents();
+            deleteEvent(recDel) {
+                if(!recDel){
+                    console.log(1);
+                    axios
+                        .delete('http://bookerclient.loc/api/event/roomEvent/'+this.events[this.selectedEvent].id+'/'+this.store.user.login+'/'+this.store.user.token)
+                        .then(response=>{
+                            if(response.data.result == 'success'){
+                                this.getEvents();
+                            }
+                        })
+                }else{
+                    console.log(2);
+                    axios
+                        .delete('http://bookerclient.loc/api/event/roomEvent/'+this.events[this.selectedEvent].id+'/'+this.store.user.login+'/'+this.store.user.token+'/all')
+                        .then(response=>{
+                            if(response.data.result == 'success'){
+                                this.getEvents();
+                            }
+                        })
+                }
                 this.$bvModal.hide('delete-modal');
             },
             changeTimeFormat() {
                 this.timeFormat = (this.timeFormat == 24) ? 12 : 24;
-                localStorage.setItem('timeFormat', this.timeFormat);
+                localStorage.timeFormat = this.timeFormat;
                 this.getEvents();
             },
             toCurrentMonth(){
